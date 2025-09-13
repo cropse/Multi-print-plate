@@ -692,6 +692,7 @@ class GCodeMultiplierGUI:
             # Create final archive
             self._create_final_archive(output_path)
 
+            self._load_project()
             self._show_success_message(selected_plates, output_path)
 
         except Exception as e:
