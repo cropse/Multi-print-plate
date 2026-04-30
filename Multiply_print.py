@@ -299,6 +299,7 @@ class GCodeMultiplierGUI:
 
         self._configure_grid_weights(main_frame)
         self._create_title(main_frame)
+        self._create_instructions(main_frame)
         self._create_file_selection(main_frame)
         self._create_files_display(main_frame)
         self._create_export_button(main_frame)
@@ -309,19 +310,53 @@ class GCodeMultiplierGUI:
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
         frame.columnconfigure(0, weight=1)
-        frame.rowconfigure(2, weight=1)
+        frame.rowconfigure(3, weight=1)
 
     def _create_title(self, parent: ttk.Frame) -> None:
         """Create the application title."""
         title_label = ttk.Label(
             parent, text="GCode 3MF Content Multiplier", font=("Arial", 16, "bold")
         )
-        title_label.grid(row=0, column=0, pady=(0, 20))
+        title_label.grid(row=0, column=0, pady=(0, 10))
+
+    def _create_instructions(self, parent: ttk.Frame) -> None:
+        """Create the how-to-use instructions section."""
+        instructions_frame = ttk.LabelFrame(parent, text="How to Use", padding="10")
+        instructions_frame.grid(row=1, column=0, sticky=(tk.W, tk.E), pady=(0, 10))
+        instructions_frame.columnconfigure(0, weight=1)
+
+        steps = [
+            ("Step 1 — Prepare your project:",
+             "In your slicer, create a project with a swap plate G-code command at the end of each plate's print.\n"
+             "This allows the printer to switch plates automatically between copies."),
+            ("Step 2 — Render all plates:",
+             "In the slicer's Preview tab, click \"All Plate Stats\" (or equivalent) to slice and render every plate.\n"
+             "Each plate must have its G-code generated before exporting the .gcode.3mf file."),
+            ("Step 3 — Load & merge:",
+             "Browse for your .gcode.3mf file, select the plates to include, set duplicate counts, then click \"Merge and Export Project\"."),
+        ]
+
+        for i, (heading, body) in enumerate(steps):
+            ttk.Label(
+                instructions_frame,
+                text=heading,
+                font=("Arial", 9, "bold"),
+                foreground="#0066cc",
+            ).grid(row=i * 2, column=0, sticky=tk.W, pady=(4 if i else 0, 0))
+
+            ttk.Label(
+                instructions_frame,
+                text=body,
+                font=("Arial", 9),
+                foreground="#444444",
+                wraplength=900,
+                justify=tk.LEFT,
+            ).grid(row=i * 2 + 1, column=0, sticky=tk.W, padx=(12, 0), pady=(0, 4))
 
     def _create_file_selection(self, parent: ttk.Frame) -> None:
         """Create the file selection section."""
         file_frame = ttk.LabelFrame(parent, text="Project Selection", padding="10")
-        file_frame.grid(row=1, column=0, sticky=(tk.W, tk.E), pady=(0, 10))
+        file_frame.grid(row=2, column=0, sticky=(tk.W, tk.E), pady=(0, 10))
         file_frame.columnconfigure(1, weight=1)
 
         ttk.Label(file_frame, text="Project Path:").grid(
@@ -339,7 +374,7 @@ class GCodeMultiplierGUI:
     def _create_files_display(self, parent: ttk.Frame) -> None:
         """Create the scrollable files display section."""
         files_frame = ttk.LabelFrame(parent, text="GCode Files", padding="10")
-        files_frame.grid(row=2, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 10))
+        files_frame.grid(row=3, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 10))
         files_frame.columnconfigure(0, weight=1)
         files_frame.rowconfigure(0, weight=1)
 
@@ -385,14 +420,14 @@ class GCodeMultiplierGUI:
             command=self._export_project,
             style="Accent.TButton",
         )
-        export_btn.grid(row=3, column=0, pady=(10, 0))
+        export_btn.grid(row=4, column=0, pady=(10, 0))
 
     def _create_status_bar(self, parent: ttk.Frame) -> None:
         """Create the status bar."""
         status_label = ttk.Label(
             parent, textvariable=self.status_var, relief=tk.SUNKEN, anchor=tk.W
         )
-        status_label.grid(row=4, column=0, sticky=(tk.W, tk.E), pady=(10, 0))
+        status_label.grid(row=5, column=0, sticky=(tk.W, tk.E), pady=(10, 0))
 
     def _browse_file(self) -> None:
         """Handle file browser dialog."""

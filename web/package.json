@@ -1,0 +1,14 @@
+{
+  "name": "gcode-3mf-multiplier",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npx vite",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "jszip": "^3.10.1",
+    "playwright": "^1.59.1",
+    "vitest": "^1.0.0"
+  }
+}

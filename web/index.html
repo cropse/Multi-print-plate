@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GCode 3MF Multiplier</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 text-slate-900">
+  <div class="flex min-h-screen flex-col">
+    <!-- Header -->
+    <header class="border-b border-slate-200 bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-10">
+      <div class="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
+        <div class="flex items-center gap-3">
+          <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500 text-white">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 11H5m14 0a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2m14 0a2 2 0 012 2v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4a2 2 0 012-2m14 0v4m-14-4v4m8-10v10" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-slate-900">GCode 3MF Multiplier</h1>
+            <p class="text-xs text-slate-500">Merge &amp; duplicate plates from your 3MF project</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-sm text-slate-500">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <span class="hidden sm:inline">100% client-side &mdash; files never leave your device</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Instructions -->
+    <section class="mx-auto w-full max-w-6xl px-6 pt-8">
+      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <button type="button"
+          class="instructions-toggle w-full flex items-center justify-between px-6 py-4 text-left hover:bg-slate-50 transition-colors"
+          aria-expanded="true">
+          <div class="flex items-center gap-3">
+            <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
+            </svg>
+            <span class="text-sm font-semibold text-slate-700">How to use</span>
+          </div>
+          <svg class="instructions-chevron h-5 w-5 text-slate-400 transition-transform duration-200" fill="none"
+            stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div class="instructions-content px-6 pb-5 border-t border-slate-100">
+          <div class="grid gap-5 pt-4 md:grid-cols-3">
+            <div class="flex gap-4">
+              <div
+                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600">
+                1</div>
+              <div>
+                <h3 class="font-semibold text-slate-900">Prepare your project</h3>
+                <p class="mt-1 text-sm text-slate-600 leading-relaxed">In your slicer, create a project with a swap
+                  plate G-code command at the end of each plate.</code>.</p>
+              </div>
+            </div>
+            <div class="flex gap-4">
+              <div
+                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600">
+                2</div>
+              <div>
+                <h3 class="font-semibold text-slate-900">Render all plates</h3>
+                <p class="mt-1 text-sm text-slate-600 leading-relaxed">In the slicer's tab, click <strong>slice
+                    all</strong> to slice and render every plate before exporting.</p>
+              </div>
+            </div>
+            <div class="flex gap-4">
+              <div
+                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600">
+                3</div>
+              <div>
+                <h3 class="font-semibold text-slate-900">Load &amp; merge</h3>
+                <p class="mt-1 text-sm text-slate-600 leading-relaxed">Click <strong>Export all sliced file</strong> to
+                  Export as <code class="rounded bg-slate-100 px-1.5 py-0.5 text-xs font-mono">.gcode.3mf </code> file
+                  and upload your
+                  file below, select plates, set duplicate counts, and export the merged project.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-6 py-8">
+      <!-- Drop Zone -->
+      <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div
+          class="drop-zone flex min-h-[240px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-10 text-center transition-all duration-200">
+          <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 mb-4">
+            <svg class="h-8 w-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+          </div>
+          <p class="text-lg font-semibold text-slate-800">Drop your <span
+              class="font-mono text-blue-600">.gcode.3mf</span> file here</p>
+          <p class="mt-2 text-sm text-slate-500">or use the button below to browse</p>
+        </div>
+      </section>
+
+      <!-- Action Bar (populated by JS) -->
+      <div id="app-actions" class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <!-- File picker and export button inserted by ensureAppShell() -->
+      </div>
+
+      <!-- File Info Bar (shown after file loaded) -->
+      <div id="file-info-bar"
+        class="file-info-bar hidden rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <p class="text-sm font-semibold text-blue-900 truncate" id="file-name-display"></p>
+            <p class="text-xs text-blue-600" id="file-meta-display"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plate Summary Bar -->
+      <div id="plate-summary-bar"
+        class="plate-summary-bar hidden rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center gap-6 text-sm">
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400">Detected:</span>
+            <span class="font-semibold text-slate-700" id="summary-detected">0</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400">Selected:</span>
+            <span class="font-semibold text-blue-600" id="summary-selected">0</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400">Total copies:</span>
+            <span class="font-semibold text-emerald-600" id="summary-total">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plates Grid (populated by JS) -->
+      <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-semibold text-slate-900">Detected Plates <span id="plates-count-badge"
+                class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 hidden"></span>
+            </h2>
+            <p class="text-sm text-slate-500">Select plates and adjust multipliers before exporting.</p>
+          </div>
+          <div class="flex items-center gap-2" id="plate-actions">
+            <!-- Select All / Deselect All / Reset All / Sort buttons inserted by JS -->
+          </div>
+        </div>
+        <div class="plates-grid">
+          <div
+            class="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center text-sm text-slate-500">
+            Upload a .gcode.3mf file to load your plates.
+          </div>
+        </div>
+      </section>
+
+      <!-- Status Bar -->
+      <div class="status-bar rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 shadow-sm"
+        role="status" aria-live="polite" aria-atomic="true">
+        <div class="flex items-center gap-2">
+          <div class="h-2 w-2 rounded-full bg-emerald-400"></div>
+          <span>Ready &mdash; upload a file to begin</span>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 bg-white/80 backdrop-blur-sm">
+      <div class="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4 text-xs text-slate-400">
+        <span>GCode 3MF Multiplier &mdash; Client-side tool</span>
+        <div class="flex items-center gap-4">
+          <span class="hidden sm:inline"><kbd
+              class="hidden sm:inline-keyboard px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-xs font-mono">Ctrl+Enter</kbd>
+            to export</span>
+          <span>No files uploaded to any server</span>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+      <div class="loading-overlay-content">
+        <div class="spinner"></div>
+        <p class="text-sm font-medium text-slate-700" id="loading-message">Merging files…</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+
+</html>
