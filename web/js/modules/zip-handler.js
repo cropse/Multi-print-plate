@@ -22,12 +22,38 @@ async function extract3MF(file) {
   }
 }
 
+/**
+ * Sort entries to match OrcaSlicer's .3mf layout:
+ *   1. [Content_Types].xml  (must be first — .3mf spec requirement)
+ *   2. PNG thumbnails       (stored, not compressed)
+ *   3. Everything else      (deflated)
+ */
+function sort3MFEntries(entries) {
+  return entries.sort(([a], [b]) => {
+    const aTypes = a === '[Content_Types].xml';
+    const bTypes = b === '[Content_Types].xml';
+    if (aTypes && !bTypes) return -1;
+    if (!aTypes && bTypes) return 1;
+
+    const aPng = a.toLowerCase().endsWith('.png');
+    const bPng = b.toLowerCase().endsWith('.png');
+    if (aPng && !bPng) return -1;
+    if (!aPng && bPng) return 1;
+
+    return a.localeCompare(b);
+  });
+}
+
 async function create3MF(files) {
   try {
     const zip = new JSZip();
 
-    for (const [path, content] of Object.entries(files ?? {})) {
-      zip.file(path, content);
+    const entries = sort3MFEntries(Object.entries(files ?? {}));
+
+    for (const [path, content] of entries) {
+      // Use DEFLATE for compressible types, STORE for already-compressed (PNG)
+      const isPng = path.toLowerCase().endsWith('.png');
+      zip.file(path, content, { compression: isPng ? 'STORE' : 'DEFLATE' });
     }
 
     const blob = await zip.generateAsync({ type: 'blob' });
