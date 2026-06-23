@@ -541,25 +541,42 @@ async function copyAllOriginalFiles(zip, outputFiles) {
 	}
 }
 
-async function copyMetadataPngFiles(zip, outputFiles) {
+async function copyMetadataFiles(zip, outputFiles) {
 	const originalFiles = await readZipListing(zip, METADATA_FOLDER);
-	const keepFiles = new Set([
-		"plate_1.png",
-		"plate_no_light_1.png",
-		"top_1.png",
-		"pick_1.png",
-		"plate_1.json",
-	]);
+
+	// Match any plate-numbered file: plate_2.gcode, plate_2_small.png, top_2.png, pick_2.png, plate_no_light_2.png, etc.
+	const plateFilePattern = /(?:plate_no_light_|plate_|top_|pick_)(\d+)/i;
 
 	for (const file of originalFiles) {
-		const basename = file.toLowerCase();
-
-		// Keep plate_1 PNGs and plate_1.json
-		if (keepFiles.has(basename)) {
-			const normalizedPath = normalizeMetadataPath(file);
-			outputFiles[normalizedPath] = await readZipFile(zip, normalizedPath);
+		const match = file.match(plateFilePattern);
+		// Skip plate_2+ files; keep plate_1 and all shared files
+		if (match && parseInt(match[1], 10) > 1) {
+			continue;
 		}
+
+		// model_settings.config and its .rels are replaced separately
+		if (file === "model_settings.config") {
+			continue;
+		}
+		if (file === "_rels/model_settings.config.rels") {
+			continue;
+		}
+
+		// plate_1.gcode is the merged output — don't overwrite it with the original
+		if (file === "plate_1.gcode") {
+			continue;
+		}
+
+		const normalizedPath = normalizeMetadataPath(file);
+		outputFiles[normalizedPath] = await readZipFile(zip, normalizedPath);
 	}
+}
+
+function createModelSettingsRels() {
+	return `<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+ <Relationship Target="/Metadata/plate_1.gcode" Id="rel-1" Type="http://schemas.bambulab.com/package/2021/gcode"/>
+</Relationships>`;
 }
 
 function buildMergeInput(selections) {
@@ -653,11 +670,14 @@ async function handleExport() {
 		// 2. Write the merged gcode as plate_1.gcode
 		outputFiles[OUTPUT_GCODE_PATH] = mergedGCode;
 
-		// 3. Copy only plate_1 PNG files from Metadata
-		await copyMetadataPngFiles(window.currentZip, outputFiles);
+		// 3. Copy ALL Metadata files except plate_2+ (preserves project_settings, slice_info, etc.)
+		await copyMetadataFiles(window.currentZip, outputFiles);
 
 		// 4. Create clean single-plate model_settings.config
 		outputFiles[MODEL_SETTINGS_PATH] = createModelSettingsConfig();
+
+		// 5. Create single-plate model_settings.config.rels
+		outputFiles["Metadata/_rels/model_settings.config.rels"] = createModelSettingsRels();
 
 		const result = await create3MF(outputFiles);
 		if (!result?.success) {
