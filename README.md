@@ -1,17 +1,17 @@
-# GCode 3MF Content Multiplier
+# GCode 3MF Multiplier
 
-A tool for merging and duplicating GCode plates from `.gcode.3mf` files. Available as both a Python desktop application and a web app.
+A client-side web app for merging and duplicating GCode plates from `.gcode.3mf` files.
 
 ## Features
 
 - **Merge Multiple Plates**: Combine multiple plates into a single plate
 - **Duplicate Plates**: Set how many times each plate should be printed
 - **Multi-Print Support**: Automatically handles plate swap commands for continuous printing
-- **Client-Side Web App**: No server upload, your files stay private
+- **Client-Side Only**: No server upload, your files stay private
 
 ## Web App
 
-The web app is deployed on GitHub Pages: **[https://cropse.github.io/Multi-print-plate/](https://cropse.github.io/Multi-print-plate/)**
+Deployed on GitHub Pages: **[https://cropse.github.io/Multi-print-plate/](https://cropse.github.io/Multi-print-plate/)**
 
 ### Usage
 
@@ -32,33 +32,6 @@ npm run dev
 ```bash
 cd web
 npm test
-```
-
-## Python Desktop App
-
-A Tkinter-based desktop application for local use.
-
-### Requirements
-
-- Python 3.13+
-- Pillow
-
-### Installation
-
-```bash
-pip install pillow
-```
-
-### Usage
-
-```bash
-python Multiply_print.py
-```
-
-Or run as a self-contained script:
-
-```bash
-uv run Multiply_print.py
 ```
 
 ## How It Works
