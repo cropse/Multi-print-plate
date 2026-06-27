@@ -4,7 +4,7 @@ const DEFAULT_FILE_PICKER_SELECTOR = '[data-file-picker]';
 const DEFAULT_FILE_INPUT_SELECTOR = '[data-file-input]';
 const DEFAULT_EXPORT_BUTTON_SELECTOR = '[data-export-button]';
 const ACCEPTED_FILE_EXTENSIONS = ['.gcode.3mf', '.3mf'];
-const DEFAULT_MULTIPLIER = 2;
+const DEFAULT_MULTIPLIER = 1;
 const MIN_MULTIPLIER = 1;
 const MAX_MULTIPLIER = 100;
 
