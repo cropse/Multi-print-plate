@@ -11,7 +11,7 @@ A tool for merging and duplicating GCode plates from `.gcode.3mf` files. Availab
 
 ## Web App
 
-The web app is deployed on GitHub Pages: **[https://your-username.github.io/multiple_print/](https://your-username.github.io/multiple_print/)**
+The web app is deployed on GitHub Pages: **[https://cropse.github.io/Multi-print-plate/](https://cropse.github.io/Multi-print-plate/)**
 
 ### Usage
 
